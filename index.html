@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare+ | Smart Healthcare Platform</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="gradient-bg">
+        <div class="gradient-animation"></div>
+    </div>
+
+    <nav class="glass-nav">
+        <div class="logo">
+            <div class="logo-animation">
+                <span class="pulse">+</span>
+                <span class="heartbeat">❤</span>
+            </div>
+            <span class="logo-text">E Swasthya<span class="highlight">+</span></span>
+        </div>
+        
+        <div class="nav-links">
+            <a href="#dashboard" class="active">Dashboard</a>
+            <a href="#family">Family</a>
+            <a href="#reports">Records</a>
+            <a href="#hospitals">Hospitals</a>
+            <div class="nav-icons">
+                <button class="icon-btn" title="Voice Assistant">
+                    <span class="material-icons">mic</span>
+                </button>
+                <button class="icon-btn sos-icon" title="Emergency">
+                    <span class="material-icons">emergency</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="nav-actions">
+            <select class="glass-select">
+                <option value="en">🌐 English</option>
+                <option value="hi">हिंदी</option>
+                <option value="es">Español</option>
+            </select>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content glass-card">
+            <h1>Your Smart Healthcare Companion</h1>
+            <p class="typewriter">AI-Powered Healthcare Solutions</p>
+            <div class="hero-buttons">
+                <button class="primary-btn">Get Started</button>
+                <button class="secondary-btn pulse-btn">Emergency SOS</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="family-dashboard">
+            <div class="dashboard-container glass-card">
+                <h2>Family Members</h2>
+                <div class="family-grid">
+                    <div class="member-card glass-card">
+                        <div class="member-avatar">👨</div>
+                        <h3>John Doe</h3>
+                        <p>Primary Member</p>
+                        <div class="member-stats">
+                            <span>Age: 45</span>
+                            <span>Blood: O+</span>
+                        </div>
+                        <button class="view-btn">View Records</button>
+                    </div>
+                    <div class="member-card glass-card">
+                        <div class="member-avatar">👩</div>
+                        <h3>Jane Doe</h3>
+                        <p>Family Member</p>
+                        <div class="member-stats">
+                            <span>Age: 40</span>
+                            <span>Blood: B+</span>
+                        </div>
+                        <button class="view-btn">View Records</button>
+                    </div>
+                    <div class="add-member glass-card">
+                        <span class="add-icon">+</span>
+                        <p>Add Family Member</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="hospital-finder">
+            <div class="finder-container glass-card">
+                <h2>Find Nearby Hospitals</h2>
+                <div class="search-box">
+                    <input type="text" placeholder="Enter your location" class="glass-input">
+                    <button class="search-btn">Search</button>
+                </div>
+                <div class="hospital-results">
+                    <div class="hospital-list">
+                        <div class="hospital-card glass-card">
+                            <h3>City Hospital</h3>
+                            <div class="hospital-info">
+                                <span>🚶‍♂️ 2.5 km away</span>
+                                <span>⏰ Open 24/7</span>
+                                <span>🚑 Emergency Available</span>
+                            </div>
+                            <button class="route-btn">Show Route</button>
+                        </div>
+                    </div>
+                    <div class="map-view glass-card">
+                        <!-- Map Integration -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="ai-scanner">
+            <div class="scanner-container glass-card">
+                <h2>AI Report Analysis</h2>
+                <div class="scanner-interface">
+                    <div class="upload-area">
+                        <span class="material-icons scanner-icon">document_scanner</span>
+                        <p>Upload Medical Report</p>
+                        <span class="supported-text">Supports: PDF, JPG, PNG</span>
+                    </div>
+                    <div class="analysis-results glass-card">
+                        <div class="result-header">
+                            <h3>AI Analysis Results</h3>
+                            <span class="material-icons">auto_awesome</span>
+                        </div>
+                        <div class="result-content">
+                            <!-- Analysis content -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="health-plan">
+            <div class="plan-container glass-card">
+                <h2>Your Health Plan</h2>
+                <div class="plan-tabs">
+                    <button class="tab-btn active">Medicines</button>
+                    <button class="tab-btn">Yoga</button>
+                    <button class="tab-btn">Diet Chart</button>
+                    <button class="tab-btn">Meditation</button>
+                </div>
+                <div class="plan-content">
+                    <!-- Plan content -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="floating-assistant">
+        <button class="assistant-btn glass-card">
+            <span class="material-icons">smart_toy</span>
+            <span>AI Health Assistant</span>
+        </button>
+    </div>
+
+    <div class="emergency-button">
+        <button class="sos-btn">
+            <span class="sos-ring"></span>
+            <span class="sos-text">SOS</span>
+        </button>
+    </div>
+</body>
+</html>
