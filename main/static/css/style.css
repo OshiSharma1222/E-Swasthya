@@ -518,3 +518,51 @@ h2 {
         width: 100%;
     }
 }
+
+/* File Preview Styles */
+.file-preview {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.file-preview h4 {
+    margin: 0 0 10px 0;
+    color: #fff;
+    font-size: 1.1em;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.file-info .material-icons {
+    font-size: 24px;
+}
+
+.view-file-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.view-file-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.view-file-btn .material-icons {
+    font-size: 18px;
+}
