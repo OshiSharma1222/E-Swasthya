@@ -262,6 +262,27 @@
                     .map(suggestion => `<li>${suggestion}</li>`)
                     .join('');
                 document.getElementById('yogaSuggestions').innerHTML = yogaSuggestionsList;
+
+                // Add file preview if available
+                if (data.file_url) {
+                    const filePreview = document.createElement('div');
+                    filePreview.className = 'file-preview glass-card';
+                    filePreview.innerHTML = `
+                        <h4>Uploaded Report</h4>
+                        <div class="file-info">
+                            <span class="material-icons">description</span>
+                            <span>${file.name}</span>
+                        </div>
+                        <a href="${data.file_url}" target="_blank" class="view-file-btn">
+                            <span class="material-icons">visibility</span>
+                            View File
+                        </a>
+                    `;
+                    document.getElementById('analysisResults').insertBefore(
+                        filePreview,
+                        document.getElementById('analysisResults').firstChild
+                    );
+                }
                 
                 // Show results section
                 document.getElementById('analysisResults').style.display = 'block';

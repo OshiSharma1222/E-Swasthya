@@ -2,45 +2,63 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import MedicalReport, ReportAnalysis, EmergencyContact, EmergencyAlert
+from .ai_analysis import analyze_medical_report
 import os
 from datetime import datetime
 import json
 import requests
 from django.conf import settings
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 def index(request):
     return render(request, 'main/index.html')
 
-@csrf_exempt  # Temporarily disable CSRF protection for testing
+@csrf_exempt
 def upload_report(request):
     if request.method == 'POST':
         try:
             file = request.FILES.get('report')
-            title = request.POST.get('title', f"Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
-            
-            # Determine file type
+            if not file:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No file uploaded'
+                }, status=400)
+
+            # Generate a unique filename
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             file_extension = os.path.splitext(file.name)[1].lower()
-            report_type = 'pdf' if file_extension == '.pdf' else 'image'
+            filename = f'reports/{timestamp}{file_extension}'
+            
+            # Save the file using default_storage
+            file_path = default_storage.save(filename, ContentFile(file.read()))
             
             # Create report object
             report = MedicalReport.objects.create(
-                title=title,
-                report_type=report_type,
-                file=file
+                title=f"Report_{timestamp}",
+                report_type='pdf' if file_extension == '.pdf' else 'image',
+                file=file_path
             )
             
-            # For demo purposes, create a sample analysis
+            # Get the full file path
+            full_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
+            
+            # Analyze the report using AI
+            analysis_result = analyze_medical_report(full_file_path)
+            
+            # Create analysis object
             analysis = ReportAnalysis.objects.create(
                 report=report,
-                analysis_text="Based on your medical report, here's what we found:\n\n1. Your overall health indicators are within normal range\n2. Blood pressure and heart rate are stable\n3. No significant abnormalities detected",
-                health_tips="1. Maintain a balanced diet with plenty of fruits and vegetables\n2. Exercise regularly (30 minutes daily)\n3. Get 7-8 hours of sleep each night\n4. Stay hydrated (8 glasses of water daily)\n5. Practice stress management techniques",
-                yoga_suggestions="1. Start with Surya Namaskar (Sun Salutation) - 5 rounds daily\n2. Practice Pranayama (Breathing exercises) - 10 minutes\n3. Include gentle stretches in your morning routine\n4. Try meditation for 15 minutes daily\n5. End your day with relaxation poses"
+                analysis_text=analysis_result['analysis_text'],
+                health_tips=analysis_result['health_tips'],
+                yoga_suggestions=analysis_result['yoga_suggestions']
             )
             
             return JsonResponse({
                 'status': 'success',
                 'message': 'Report uploaded and analyzed successfully',
                 'report_id': report.id,
+                'file_url': report.file.url if report.file else None,
                 'analysis': {
                     'text': analysis.analysis_text,
                     'health_tips': analysis.health_tips,
@@ -49,6 +67,10 @@ def upload_report(request):
             })
             
         except Exception as e:
+            # Clean up the uploaded file if analysis fails
+            if 'file_path' in locals():
+                default_storage.delete(file_path)
+            
             return JsonResponse({
                 'status': 'error',
                 'message': str(e)
