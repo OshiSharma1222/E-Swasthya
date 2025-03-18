@@ -4,9 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediCare+ | Smart Healthcare Platform</title>
+    <title>E-Swasthya+ | Smart Healthcare Platform</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/healthbot.css' %}">
+    {% csrf_token %}
 </head>
 <body>
     <div class="gradient-bg">
@@ -19,7 +22,7 @@
                 <span class="pulse">+</span>
                 <span class="heartbeat">❤</span>
             </div>
-            <span class="logo-text">E Swasthya<span class="highlight">+</span></span>
+            <span class="logo-text">E-Swasthya<span class="highlight">+</span></span>
         </div>
         
         <div class="nav-links">
@@ -28,9 +31,6 @@
             <a href="#reports">Records</a>
             <a href="#hospitals">Hospitals</a>
             <div class="nav-icons">
-                <button class="icon-btn" title="Voice Assistant">
-                    <span class="material-icons">mic</span>
-                </button>
                 <button class="icon-btn sos-icon" title="Emergency">
                     <span class="material-icons">emergency</span>
                 </button>
@@ -203,6 +203,35 @@
             </div>
             <button class="close-modal" onclick="hideEmergencyOptions()">
                 <span class="material-icons">close</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Health Assistant Chatbot -->
+    <div class="health-assistant">
+        <div class="chat-header">
+            <h3><i class="fas fa-robot"></i> E-Swasthya+ Assistant</h3>
+            <button class="toggle-chat" onclick="document.querySelector('.health-assistant').classList.toggle('minimized')">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+        <div class="chat-messages">
+            <div class="message bot-message">Hello! I'm your E-Swasthya+ Assistant. I can help you with:
+• Managing medical records
+• Family health dashboard
+• Emergency services
+• Finding hospitals
+• Health report analysis
+
+You can type or use voice commands to ask questions!</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" placeholder="Type or click microphone to speak...">
+            <button id="mic-button" title="Click to speak">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button type="submit">
+                <i class="fas fa-paper-plane"></i>
             </button>
         </div>
     </div>
@@ -552,7 +581,7 @@
     .sos-btn {
         position: fixed;
         bottom: 2rem;
-        right: 2rem;
+        left: 2rem;
         width: 80px;
         height: 80px;
         border-radius: 50%;
@@ -595,5 +624,8 @@
         }
     }
     </style>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/healthbot.js' %}"></script>
 </body>
 </html> 
