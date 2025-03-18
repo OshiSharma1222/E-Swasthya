@@ -92,24 +92,98 @@
         <section class="hospital-finder">
             <div class="finder-container glass-card">
                 <h2>Find Nearby Hospitals</h2>
-                <div class="search-box">
-                    <input type="text" placeholder="Enter your location" class="glass-input">
-                    <button class="search-btn">Search</button>
+                <div class="search-filters">
+                    <div class="search-box">
+                        <span class="material-icons search-icon">search</span>
+                        <input type="text" placeholder="Enter your location or hospital name" class="glass-input" id="hospitalSearch">
+                        <button class="locate-btn" title="Use current location">
+                            <span class="material-icons">my_location</span>
+                        </button>
+                    </div>
+                    <div class="filter-group">
+                        <select class="glass-select filter-select">
+                            <option value="">Hospital Type</option>
+                            <option value="general">General Hospital</option>
+                            <option value="specialty">Specialty Hospital</option>
+                            <option value="clinic">Clinic</option>
+                            <option value="emergency">Emergency Center</option>
+                        </select>
+                        <select class="glass-select filter-select">
+                            <option value="">Services</option>
+                            <option value="emergency">Emergency Care</option>
+                            <option value="covid">COVID-19 Care</option>
+                            <option value="pediatric">Pediatric Care</option>
+                            <option value="cardiology">Cardiology</option>
+                        </select>
+                        <select class="glass-select filter-select">
+                            <option value="">Distance</option>
+                            <option value="1">Within 1 km</option>
+                            <option value="5">Within 5 km</option>
+                            <option value="10">Within 10 km</option>
+                            <option value="20">Within 20 km</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="hospital-results">
                     <div class="hospital-list">
                         <div class="hospital-card glass-card">
+                            <div class="hospital-header">
+                                <div class="hospital-status open">Open Now</div>
+                                <button class="favorite-btn" title="Add to favorites">
+                                    <span class="material-icons">favorite_border</span>
+                                </button>
+                            </div>
                             <h3>City Hospital</h3>
                             <div class="hospital-info">
-                                <span>🚶‍♂️ 2.5 km away</span>
-                                <span>⏰ Open 24/7</span>
-                                <span>🚑 Emergency Available</span>
+                                <div class="info-item">
+                                    <span class="material-icons">place</span>
+                                    <span>2.5 km away</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="material-icons">access_time</span>
+                                    <span>Open 24/7</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="material-icons">local_hospital</span>
+                                    <span>Emergency Available</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="material-icons">star</span>
+                                    <span>4.5 (234 reviews)</span>
+                                </div>
                             </div>
-                            <button class="route-btn">Show Route</button>
+                            <div class="hospital-services">
+                                <span class="service-tag">ICU</span>
+                                <span class="service-tag">COVID-19</span>
+                                <span class="service-tag">Cardiology</span>
+                                <span class="service-tag">+3 more</span>
+                            </div>
+                            <div class="hospital-actions">
+                                <button class="route-btn primary-btn">
+                                    <span class="material-icons">directions</span>
+                                    Get Directions
+                                </button>
+                                <button class="call-btn secondary-btn">
+                                    <span class="material-icons">phone</span>
+                                    Call Now
+                                </button>
+                            </div>
                         </div>
+                        <!-- More hospital cards will be dynamically added here -->
                     </div>
                     <div class="map-view glass-card">
-                        <!-- Map Integration -->
+                        <div id="hospitalMap"></div>
+                        <div class="map-controls">
+                            <button class="map-control-btn" title="Zoom In">
+                                <span class="material-icons">add</span>
+                            </button>
+                            <button class="map-control-btn" title="Zoom Out">
+                                <span class="material-icons">remove</span>
+                            </button>
+                            <button class="map-control-btn" title="Center Map">
+                                <span class="material-icons">center_focus_strong</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
