@@ -1,138 +1,104 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
-import json
-from ..services.blockchain_service import BlockchainService
-import hashlib
+from django.shortcuts import render
+from ..models import MedicalReport, ReportAnalysis
+from ..ai_analysis import analyze_medical_report
+import os
+from datetime import datetime
+from django.conf import settings
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
-blockchain_service = BlockchainService()
-
-def generate_report_hash(patient_id, report_data):
-    """Generate a unique hash for the medical report"""
-    data = f"{patient_id}-{report_data}".encode()
-    return hashlib.sha256(data).hexdigest()
+def index(request):
+    return render(request, 'main/index.html')
 
 @csrf_exempt
-@require_http_methods(["POST"])
-def store_medical_record(request):
-    """Store a new medical record on the blockchain"""
-    try:
-        data = json.loads(request.body)
-        patient_id = data.get('patient_id')
-        report_data = data.get('report_data')
-        
-        if not patient_id or not report_data:
+def upload_report(request):
+    if request.method == 'POST':
+        try:
+            file = request.FILES.get('report')
+            if not file:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No file uploaded'
+                }, status=400)
+
+            # Generate a unique filename
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            file_extension = os.path.splitext(file.name)[1].lower()
+            filename = f'reports/{timestamp}{file_extension}'
+            
+            # Save the file using default_storage
+            file_path = default_storage.save(filename, ContentFile(file.read()))
+            
+            # Create report object
+            report = MedicalReport.objects.create(
+                title=f"Report_{timestamp}",
+                report_type='pdf' if file_extension == '.pdf' else 'image',
+                file=file_path
+            )
+            
+            # Get the full file path
+            full_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
+            
+            # Analyze the report using AI
+            analysis_result = analyze_medical_report(full_file_path)
+            
+            # Create analysis object
+            analysis = ReportAnalysis.objects.create(
+                report=report,
+                analysis_text=analysis_result['analysis_text'],
+                health_tips=analysis_result['health_tips'],
+                yoga_suggestions=analysis_result['yoga_suggestions']
+            )
+            
             return JsonResponse({
-                'success': False,
-                'error': 'Missing required fields'
-            }, status=400)
-        
-        # Generate report hash
-        report_hash = generate_report_hash(patient_id, report_data)
-        
-        # Store on blockchain
-        result = blockchain_service.store_medical_record(
-            patient_id,
-            report_hash,
-            report_data
-        )
-        
-        if result['success']:
-            return JsonResponse(result)
-        else:
-            return JsonResponse(result, status=500)
+                'status': 'success',
+                'message': 'Report uploaded and analyzed successfully',
+                'report_id': report.id,
+                'file_url': report.file.url if report.file else None,
+                'analysis': {
+                    'text': analysis.analysis_text,
+                    'health_tips': analysis.health_tips,
+                    'yoga_suggestions': analysis.yoga_suggestions
+                }
+            })
             
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)
-
-@require_http_methods(["GET"])
-def get_medical_record(request, patient_id, report_hash):
-    """Retrieve a medical record from the blockchain"""
-    try:
-        result = blockchain_service.get_medical_record(patient_id, report_hash)
-        
-        if result['success']:
-            return JsonResponse(result)
-        else:
-            return JsonResponse(result, status=404)
+        except Exception as e:
+            # Clean up the uploaded file if analysis fails
+            if 'file_path' in locals():
+                default_storage.delete(file_path)
             
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)
-
-@csrf_exempt
-@require_http_methods(["PUT"])
-def update_medical_record(request, patient_id, report_hash):
-    """Update an existing medical record"""
-    try:
-        data = json.loads(request.body)
-        new_report_data = data.get('report_data')
-        
-        if not new_report_data:
             return JsonResponse({
-                'success': False,
-                'error': 'Missing report data'
+                'status': 'error',
+                'message': str(e)
             }, status=400)
-        
-        result = blockchain_service.update_medical_record(
-            patient_id,
-            report_hash,
-            new_report_data
-        )
-        
-        if result['success']:
-            return JsonResponse(result)
-        else:
-            return JsonResponse(result, status=500)
-            
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)
+    
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Invalid request method'
+    }, status=405)
 
-@csrf_exempt
-@require_http_methods(["DELETE"])
-def invalidate_medical_record(request, patient_id, report_hash):
-    """Invalidate a medical record"""
+def get_report_analysis(request, report_id):
     try:
-        result = blockchain_service.invalidate_medical_record(
-            patient_id,
-            report_hash
-        )
+        report = MedicalReport.objects.get(id=report_id)
+        analysis = ReportAnalysis.objects.get(report=report)
         
-        if result['success']:
-            return JsonResponse(result)
-        else:
-            return JsonResponse(result, status=500)
-            
-    except Exception as e:
         return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)
-
-@require_http_methods(["GET"])
-def verify_record_integrity(request, patient_id, report_hash):
-    """Verify the integrity of a medical record"""
-    try:
-        result = blockchain_service.verify_record_integrity(
-            patient_id,
-            report_hash
-        )
-        
-        if result['success']:
-            return JsonResponse(result)
-        else:
-            return JsonResponse(result, status=500)
-            
-    except Exception as e:
+            'status': 'success',
+            'analysis': {
+                'text': analysis.analysis_text,
+                'health_tips': analysis.health_tips,
+                'yoga_suggestions': analysis.yoga_suggestions
+            }
+        })
+    except MedicalReport.DoesNotExist:
         return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500) 
+            'status': 'error',
+            'message': 'Report not found'
+        }, status=404)
+    except ReportAnalysis.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Analysis not found'
+        }, status=404) 
