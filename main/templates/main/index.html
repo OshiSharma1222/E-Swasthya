@@ -10,6 +10,116 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/healthbot.css' %}">
     {% csrf_token %}
+    <style>
+        /* Smooth scrolling for the entire page */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Add padding to sections to account for fixed header */
+        section {
+            scroll-margin-top: 100px;
+        }
+        
+        /* Active link styling */
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+        }
+
+        /* Health Recommendations Styles */
+        .health-recommendations {
+            padding: 2rem;
+        }
+
+        .recommendations-container {
+            padding: 2rem;
+        }
+
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .recommendation-card {
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header .material-icons {
+            font-size: 2rem;
+            color: #4CAF50;
+        }
+
+        .medication-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .exercise-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .exercise-item h4 {
+            margin-bottom: 0.5rem;
+            color: #4CAF50;
+        }
+
+        .exercise-item ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        .exercise-item li {
+            padding: 0.3rem 0;
+        }
+
+        .meal-plan .meal {
+            margin-bottom: 1rem;
+        }
+
+        .meal h4 {
+            color: #4CAF50;
+            margin-bottom: 0.3rem;
+        }
+
+        .prescription-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .prescription-item .view-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 20px;
+            background: rgba(76, 175, 80, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .prescription-item .view-btn:hover {
+            background: rgba(76, 175, 80, 0.4);
+        }
+    </style>
 </head>
 <body>
     <div class="gradient-bg">
@@ -27,8 +137,9 @@
         
         <div class="nav-links">
             <a href="#dashboard" class="active">Dashboard</a>
-            <a href="#family">Family</a>
+            <a href="#dashboard">Family</a>
             <a href="#reports">Records</a>
+            <a href="#health-plan">Health Plan</a>
             <a href="#hospitals">Hospitals</a>
             <div class="nav-icons">
                 <button class="icon-btn sos-icon" title="Emergency">
@@ -38,6 +149,16 @@
         </div>
 
         <div class="nav-actions">
+            {% if user.is_authenticated %}
+                <span class="user-greeting">Welcome, {{ user.username }}</span>
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="auth-btn">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="auth-btn">Login</a>
+                <a href="{% url 'accounts:register' %}" class="auth-btn">Register</a>
+            {% endif %}
             <select class="glass-select">
                 <option value="en">🌐 English</option>
                 <option value="hi">हिंदी</option>
@@ -58,7 +179,7 @@
     </header>
 
     <main>
-        <section class="family-dashboard">
+        <section id="dashboard" class="family-dashboard">
             <div class="dashboard-container glass-card">
                 <h2>Family Members</h2>
                 <div class="family-grid">
@@ -72,16 +193,6 @@
                         </div>
                         <button class="view-btn">View Records</button>
                     </div>
-                    <div class="member-card glass-card">
-                        <div class="member-avatar">👩</div>
-                        <h3>Jane Doe</h3>
-                        <p>Family Member</p>
-                        <div class="member-stats">
-                            <span>Age: 40</span>
-                            <span>Blood: B+</span>
-                        </div>
-                        <button class="view-btn">View Records</button>
-                    </div>
                     <div class="add-member glass-card">
                         <span class="add-icon">+</span>
                         <p>Add Family Member</p>
@@ -90,35 +201,9 @@
             </div>
         </section>
 
-        <section class="hospital-finder">
-            <div class="finder-container glass-card">
-                <h2>Find Nearby Hospitals</h2>
-                <div class="search-box">
-                    <input type="text" placeholder="Enter your location" class="glass-input">
-                    <button class="search-btn">Search</button>
-                </div>
-                <div class="hospital-results">
-                    <div class="hospital-list">
-                        <div class="hospital-card glass-card">
-                            <h3>City Hospital</h3>
-                            <div class="hospital-info">
-                                <span>🚶‍♂️ 2.5 km away</span>
-                                <span>⏰ Open 24/7</span>
-                                <span>🚑 Emergency Available</span>
-                            </div>
-                            <button class="route-btn">Show Route</button>
-                        </div>
-                    </div>
-                    <div class="map-view glass-card">
-                        <!-- Map Integration -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="ai-scanner">
+        <section id="reports" class="ai-scanner">
             <div class="scanner-container glass-card">
-                <h2>AI Report Analysis</h2>
+                <h2>Medical Records</h2>
                 <div class="scanner-interface">
                     <div class="upload-area" id="uploadArea">
                         <span class="material-icons scanner-icon">document_scanner</span>
@@ -153,17 +238,63 @@
             </div>
         </section>
 
-        <section class="health-plan">
-            <div class="plan-container glass-card">
-                <h2>Your Health Plan</h2>
-                <div class="plan-tabs">
-                    <button class="tab-btn active">Medicines</button>
-                    <button class="tab-btn">Yoga</button>
-                    <button class="tab-btn">Diet Chart</button>
-                    <button class="tab-btn">Meditation</button>
+        <section id="health-plan" class="health-recommendations">
+            <div class="recommendations-container glass-card">
+                <h2>Health Management</h2>
+                <div class="recommendations-grid">
+                    <div class="recommendation-card glass-card" style="cursor: pointer;">
+                        <div class="card-header">
+                            <span class="material-icons">medication</span>
+                            <h3>Medications</h3>
+                        </div>
+                    </div>
+
+                    <div class="recommendation-card glass-card" style="cursor: pointer;">
+                        <div class="card-header">
+                            <span class="material-icons">self_improvement</span>
+                            <h3>Yoga & Exercise</h3>
+                        </div>
+                    </div>
+
+                    <div class="recommendation-card glass-card" style="cursor: pointer;">
+                        <div class="card-header">
+                            <span class="material-icons">restaurant_menu</span>
+                            <h3>Diet Plan</h3>
+                        </div>
+                    </div>
+
+                    <div class="recommendation-card glass-card" style="cursor: pointer;">
+                        <div class="card-header">
+                            <span class="material-icons">description</span>
+                            <h3>Prescriptions</h3>
+                        </div>
+                    </div>
                 </div>
-                <div class="plan-content">
-                    <!-- Plan content -->
+            </div>
+        </section>
+
+        <section id="hospitals" class="hospital-finder">
+            <div class="finder-container glass-card">
+                <h2>Find Nearby Hospitals</h2>
+                <div class="search-box">
+                    <input type="text" placeholder="Enter your location" class="glass-input">
+                    <button class="search-btn">Search</button>
+                </div>
+                <div class="hospital-results">
+                    <div class="hospital-list">
+                        <div class="hospital-card glass-card">
+                            <h3>City Hospital</h3>
+                            <div class="hospital-info">
+                                <span>🚶‍♂️ 2.5 km away</span>
+                                <span>⏰ Open 24/7</span>
+                                <span>🚑 Emergency Available</span>
+                            </div>
+                            <button class="route-btn">Show Route</button>
+                        </div>
+                    </div>
+                    <div class="map-view glass-card">
+                        <!-- Map Integration -->
+                    </div>
                 </div>
             </div>
         </section>
@@ -489,6 +620,50 @@ You can type or use voice commands to ask questions!</div>
 
     // Load emergency contacts when the page loads
     document.addEventListener('DOMContentLoaded', loadEmergencyContacts);
+
+    // Add smooth scrolling and active link highlighting
+    document.addEventListener('DOMContentLoaded', function() {
+        const navLinks = document.querySelectorAll('.nav-links a');
+        const sections = document.querySelectorAll('section');
+        
+        // Function to update active link
+        function updateActiveLink() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Update active link on scroll
+        window.addEventListener('scroll', updateActiveLink);
+
+        // Smooth scroll for navigation links
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                
+                if (targetSection) {
+                    window.scrollTo({
+                        top: targetSection.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    });
     </script>
 
     <style>
@@ -622,6 +797,22 @@ You can type or use voice commands to ask questions!</div>
             transform: scale(1.5);
             opacity: 0;
         }
+    }
+
+    .recommendation-card {
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .recommendation-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+    
+    .card-description {
+        color: rgba(255,255,255,0.8);
+        margin-top: 1rem;
+        text-align: center;
     }
     </style>
 
